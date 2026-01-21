@@ -1,0 +1,97 @@
+Security Considerations
+
+1. Signature Verification
+
+· KYC providers must sign attestations with registered keys
+· Multi-sig support for high-value attestations
+· Time-locked updates to prevent flash attacks
+
+2. Replay Protection
+
+```rust
+// Include nonce in attestation hash
+pub fn hash_kyc_data(wallet: &Pubkey) -> [u8; 32] {
+    let mut hasher = Sha256::new();
+    hasher.update(wallet.as_ref());
+    hasher.update(&Clock::get().unwrap().slot.to_le_bytes());
+    hasher.update(&rand::random::<[u8; 8]>()); // Nonce
+    hasher.finalize().into()
+}
+```
+
+3. Privacy Protection
+
+· Store only attestation results, not PII
+· Use zero-knowledge proofs for sensitive checks
+· Optional privacy pools for mixing compliant outputs
+
+4. Upgrade Safety
+
+· Immutable attestation history
+· Versioned compliance configs
+· Emergency pause functionality
+
+Regulatory Considerations
+
+1. AML/CFT Compliance
+
+· Daily payout limits per wallet
+· Suspicious activity monitoring hooks
+· OFAC/SDN list integration points
+· Travel rule support for large transfers
+
+2. Data Retention
+
+· Attestation records kept for 5+ years
+· Audit trail of all verification events
+· GDPR-compliant data minimization
+
+3. Jurisdictional Flexibility
+
+```rust
+pub struct JurisdictionRules {
+    pub allowed_countries: Vec<[u8; 2]>,
+    pub kyc_thresholds: HashMap<u8, u64>, // Level → max amount
+    pub tax_reporting: bool,              // 1099/Form 8 equivalent
+    pub data_localization: Option<String>,// GDPR/CCPA requirements
+}
+```
+
+4. Dispute Resolution
+
+· Attestation challenge periods
+· Provider reputation system
+· Arbitration oracle integration
+· Insurance fund for false attestations
+
+Integration Points
+
+1. Existing KYC SDK Integration
+
+```rust
+// Assuming KYC SDK provides a standard interface
+impl KYCSDK for ComplianceAdapter {
+    fn verify_identity(&self, proof: IdentityProof) -> AttestationResult {
+        // Delegate to SDK, then store result in PDA
+    }
+    
+    fn check_sanctions(&self, wallet: Pubkey) -> SanctionsStatus {
+        // Query external oracle or on-chain list
+    }
+}
+```
+
+2. Cross-Chain Considerations
+
+· Wormhole/Portal bridge compatibility
+· Multi-chain attestation sync
+· Cross-chain AML monitoring
+
+3. DeFi Integration
+
+· Compatible with SPL tokens and NFTs
+· Works with Solana Pay for direct merchant payouts
+· Supports staking/lending protocol integrations
+
+This architecture provides a robust, regulatory-compliant KYC layer for PoW payout protocols while maintaining Solana's performance advantages and minimizing user friction.
+
