@@ -1,0 +1,14 @@
+ Compliance Configuration
+
+```rust
+#[account]
+pub struct ComplianceConfig {
+    pub admin: Pubkey,                 // Protocol admin
+    pub kyc_required_level: u8,        // Minimum KYC level required
+    pub banned_countries: Vec<[u8; 2]>,// ISO country codes
+    pub max_daily_payout: u64,         // Anti-money laundering limit
+    pub attestation_lifetime_slots: u64,// Default expiry duration
+    pub grace_period_slots: u64,       // Grace period after expiry
+    pub version: u8,
+    pub bump: u8,
+}
