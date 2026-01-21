@@ -1,0 +1,527 @@
+Schema Definition (pow-schema.json)
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Proof-of-Contribution Configuration",
+  "version": "1.0.0",
+  "description": "Deterministic schema for Proof-of-Contribution milestones and payouts",
+  
+  "type": "object",
+  "required": ["version", "project", "milestones"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "Schema version for forward compatibility"
+    },
+    
+    "project": {
+      "type": "object",
+      "required": ["id", "repository", "license"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$",
+          "description": "Unique project identifier (lowercase, hyphens)"
+        },
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "description": "Git repository URL"
+        },
+        "license": {
+          "type": "string",
+          "enum": ["MIT", "Apache-2.0", "GPL-3.0", "BSD-3-Clause"],
+          "description": "OSI-approved license"
+        },
+        "commit_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{40}$",
+          "description": "Specific commit hash this config applies to"
+        }
+      }
+    },
+    
+    "milestones": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "acceptance_criteria", "payout"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Z0-9-]+$",
+            "description": "Unique milestone ID (uppercase, hyphens)"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "type", "condition"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": ["commit", "pull_request", "test_passing", "release", "code_review", "documentation"]
+                },
+                "condition": {
+                  "type": "object",
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "min_count": { "type": "integer", "minimum": 1 },
+                        "author": { "type": "string" }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "pr_number": { "type": "integer" },
+                        "merged": { "type": "boolean" }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "test_suite": { "type": "string" },
+                        "coverage_min": { "type": "number", "minimum": 0, "maximum": 100 }
+                      }
+                    },
+                    {
+                      "properties": {
+                        "tag_pattern": { "type": "string" },
+                        "assets": { "type": "array", "items": { "type": "string" } }
+                      }
+                    }
+                  ]
+                },
+                "verification_data": {
+                  "type": "object",
+                  "properties": {
+                    "commit_hash": { "type": "string" },
+                    "pr_url": { "type": "string" },
+                    "test_report_url": { "type": "string" },
+                    "release_url": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "required_proofs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": ["git_commit", "signed_pr", "ci_passing", "code_coverage", "binary_artifact"]
+            }
+          },
+          "payout": {
+            "type": "object",
+            "required": ["total", "splits"],
+            "properties": {
+              "total": {
+                "type": "string",
+                "pattern": "^[0-9]+(\\.[0-9]{1,18})?$",
+                "description": "Total payout amount in base tokens"
+              },
+              "token": {
+                "type": "string",
+                "pattern": "^0x[a-fA-F0-9]{40}$",
+                "description": "ERC-20 token address (optional, defaults to native token)"
+              },
+              "splits": {
+                "type": "object",
+                "required": ["contributor", "treasury", "platform"],
+                "properties": {
+                  "contributor": {
+                    "type": "string",
+                    "pattern": "^[0-9]+(\\.[0-9]{1,2})?%$",
+                    "description": "Percentage to contributor (e.g., '70%')"
+                  },
+                  "treasury": {
+                    "type": "string",
+                    "pattern": "^[0-9]+(\\.[0-9]{1,2})?%$",
+                    "description": "Percentage to project treasury"
+                  },
+                  "platform": {
+                    "type": "string",
+                    "pattern": "^[0-9]+(\\.[0-9]{1,2})?%$",
+                    "description": "Percentage to protocol platform"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO 8601 timestamp for milestone completion deadline"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z0-9-]+$"
+            },
+            "description": "IDs of milestones that must be completed first"
+          }
+        }
+      }
+    },
+    
+    "attestation_config": {
+      "type": "object",
+      "properties": {
+        "chain_id": {
+          "type": "integer",
+          "description": "EIP-155 chain ID for on-chain attestation"
+        },
+        "registry_address": {
+          "type": "string",
+          "pattern": "^0x[a-fA-F0-9]{40}$"
+        },
+        "verification_interval": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Blocks between verification attempts"
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
+
+
+Example Configurations
+
+Simple Project (examples/simple-project/pow.yaml)
+
+```yaml
+version: "1.0.0"
+
+project:
+  id: "simple-dapp"
+  repository: "https://github.com/user/simple-dapp"
+  license: "MIT"
+  commit_hash: "a1b2c3d4e5f67890123456789012345678901234"
+
+milestones:
+  - id: "MILESTONE-1"
+    title: "Core Contract Implementation"
+    description: "Implement main smart contract with basic functionality"
+    
+    acceptance_criteria:
+      - id: "contract-impl"
+        type: "commit"
+        condition:
+          min_count: 3
+          author: "dev-alice"
+        verification_data:
+          commit_hash: "b2c3d4e5f67890123456789012345678901234567"
+      
+      - id: "tests-passing"
+        type: "test_passing"
+        condition:
+          test_suite: "hardhat"
+          coverage_min: 80
+        verification_data:
+          test_report_url: "https://ci.example.com/reports/123"
+    
+    required_proofs:
+      - "git_commit"
+      - "ci_passing"
+    
+    payout:
+      total: "1000.0"
+      token: "0xERC20TOKENADDRESS"
+      splits:
+        contributor: "70%"
+        treasury: "20%"
+        platform: "10%"
+    
+    deadline: "2024-12-31T23:59:59Z"
+
+
+Multi-Milestone Project (examples/multi-milestone/pow.yaml)
+
+```yaml
+version: "1.0.0"
+
+project:
+  id: "multi-phase-project"
+  repository: "https://github.com/org/multi-phase"
+  license: "Apache-2.0"
+
+milestones:
+  - id: "PHASE-1"
+    title: "Protocol Design"
+    acceptance_criteria:
+      - id: "spec-doc"
+        type: "documentation"
+        condition:
+          min_count: 1
+        verification_data:
+          commit_hash: "spec1234567890123456789012345678901234567890"
+    
+    payout:
+      total: "500.0"
+      splits:
+        contributor: "60%"
+        treasury: "30%"
+        platform: "10%"
+  
+  - id: "PHASE-2"
+    title: "Implementation"
+    acceptance_criteria:
+      - id: "main-impl"
+        type: "commit"
+        condition:
+          min_count: 10
+        verification_data:
+          commit_hash: "impl1234567890123456789012345678901234567890"
+      
+      - id: "code-review"
+        type: "code_review"
+        condition:
+          min_count: 2
+        verification_data:
+          pr_url: "https://github.com/org/multi-phase/pull/42"
+    
+    required_proofs:
+      - "git_commit"
+      - "signed_pr"
+    
+    dependencies: ["PHASE-1"]
+    
+    payout:
+      total: "2000.0"
+      splits:
+        contributor: "75%"
+        treasury: "15%"
+        platform: "10%"
+  
+  - id: "PHASE-3"
+    title: "Release"
+    acceptance_criteria:
+      - id: "v1-release"
+        type: "release"
+        condition:
+          tag_pattern: "v1.0.*"
+          assets: ["binary-linux", "binary-macos"]
+        verification_data:
+          release_url: "https://github.com/org/multi-phase/releases/tag/v1.0.0"
+    
+    dependencies: ["PHASE-2"]
+    
+    payout:
+      total: "1000.0"
+      splits:
+        contributor: "80%"
+        treasury: "15%"
+        platform: "5%"
+
+attestation_config:
+  chain_id: 1
+  registry_address: "0xAttestationRegistryAddress"
+  verification_interval: 100
+
+
+Validation Rules & Failure Cases
+
+Core Validation Rules:
+
+1. Deterministic Parsing: YAML parsed with ordered keys and no anchors/aliases
+2. Sum Validation: Payout splits must sum to 100% ± 0.01% tolerance
+3. DAG Validation: Milestone dependencies must form a directed acyclic graph
+4. Temporal Consistency: Deadlines must be in the future at creation time
+5. Proof Uniqueness: Proof IDs must be unique within a milestone
+6. Repository Access: Git repository must be publicly accessible
+
+Failure Cases:
+
+```typescript
+// Validation error types
+enum ValidationError {
+  INVALID_SCHEMA = "INVALID_SCHEMA",
+  SPLIT_SUM_MISMATCH = "SPLIT_SUM_MISMATCH", // Splits don't sum to 100%
+  CIRCULAR_DEPENDENCY = "CIRCULAR_DEPENDENCY",
+  DUPLICATE_PROOF_ID = "DUPLICATE_PROOF_ID",
+  INVALID_COMMIT_HASH = "INVALID_COMMIT_HASH",
+  REPOSITORY_INACCESSIBLE = "REPOSITORY_INACCESSIBLE",
+  DEADLINE_PAST = "DEADLINE_PAST",
+  MILESTONE_UNFUNDED = "MILESTONE_UNFUNDED"
+}
+
+// Runtime error types
+enum RuntimeError {
+  PROOF_NOT_FOUND = "PROOF_NOT_FOUND",
+  CRITERIA_NOT_MET = "CRITERIA_NOT_MET",
+  DEADLINE_EXCEEDED = "DEADLINE_EXCEEDED",
+  ATTESTATION_FAILED = "ATTESTATION_FAILED",
+  INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE"
+}
+
+
+Off-chain to On-chain Attestation Process
+
+1. Proof Aggregation:
+
+```typescript
+// Off-chain proof structure
+interface OffChainProof {
+  milestoneId: string;
+  proofId: string;
+  proofType: string;
+  data: string; // JSON string of verification_data
+  signature: string; // Contributor's EIP-712 signature
+  timestamp: number;
+  verifier: string; // Address of verifying oracle
+}
+
+// Aggregation process
+class ProofAggregator {
+  async aggregateProofs(
+    milestoneId: string,
+    proofs: OffChainProof[]
+  ): Promise<MerkleTree> {
+    // 1. Validate each proof against acceptance criteria
+    // 2. Sort proofs deterministically (by proofId, then timestamp)
+    // 3. Construct Merkle tree from proof hashes
+    // 4. Return Merkle root and proofs for on-chain submission
+  }
+}
+
+
+2. Merkle Tree Construction:
+
+
+Merkle Tree Structure:
+          Root Hash
+         /        \
+     Hash(A)      Hash(B)
+    /      \      /      \
+Proof1  Proof2  Proof3  Proof4
+
+Where:
+Hash = keccak256(
+  milestoneId,
+  proofId,
+  keccak256(data),
+  timestamp,
+  verifier
+)
+
+
+3. On-chain Attestation:
+
+```solidity
+// Sample smart contract interface
+interface IAttestationRegistry {
+  struct Attestation {
+    bytes32 configHash; // Hash of pow.yaml
+    bytes32 milestoneRoot; // Merkle root of completed proofs
+    address verifier;
+    uint256 timestamp;
+    bool verified;
+  }
+  
+  function attestCompletion(
+    bytes32 configHash,
+    string calldata milestoneId,
+    bytes32 milestoneRoot,
+    bytes32[] calldata proof, // Merkle proof for this milestone
+    uint256 payoutAmount
+  ) external returns (bytes32 attestationId);
+  
+  function verifyAttestation(
+    bytes32 attestationId,
+    OffChainProof calldata proof,
+    bytes32[] calldata merkleProof
+  ) external view returns (bool);
+}
+
+
+4. Verification Flow:
+
+
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Off-chain     │    │   Aggregator    │    │   On-chain      │
+│     Proofs      │───▶│   (Oracle)      │───▶│  Attestation    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         │ 1. Collect proofs     │ 2. Build Merkle tree  │ 3. Submit root
+         │    (commits, tests)   │    & sign             │    with signatures
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Git History   │    │   Merkle Root   │    │   Smart Contract│
+│   CI Results    │    │   + Signatures  │    │   Verification  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+
+
+Design Rationale
+
+1. Deterministic Schema:
+
+· Why: Ensures identical configuration files produce identical hashes
+· Implementation: Ordered JSON/YAML parsing, prohibited YAML features
+· Benefit: Enables trustless verification of configuration integrity
+
+2. Machine-Verifiable Proofs:
+
+· Why: Eliminates subjective evaluation of contributions
+· Implementation: Git commit hashes, CI results, signed PRs
+· Benefit: Automated, objective verification reduces disputes
+
+3. Merkle Tree Proof Aggregation:
+
+· Why: Gas-efficient on-chain verification
+· Implementation: Single root hash represents multiple off-chain proofs
+· Benefit: Scalable proof verification with minimal on-chain storage
+
+4. Split Payout Structure:
+
+· Why: Sustainable ecosystem funding
+· Implementation: Fixed percentages for contributor/treasury/platform
+· Benefit: Incentivizes maintenance and protocol development
+
+5. Milestone Dependencies:
+
+· Why: Enables complex project planning
+· Implementation: Directed acyclic graph validation
+· Benefit: Sequential completion enforcement
+
+6. Deadline Enforcement:
+
+· Why: Prevents indefinite open bounties
+· Implementation: ISO 8601 timestamps with timezone
+· Benefit: Clear expectations for contributors
+
+7. Signature Requirements:
+
+· Why: Non-repudiation of contributions
+· Implementation: EIP-712 signed proofs
+· Benefit: Cryptographic proof of contribution authorship
+
+Security Considerations
+
+1. Replay Protection: Timestamps and nonces in signatures
+2. Oracle Decentralization: Multiple verifiers for attestations
+3. Grace Periods: Allow for dispute resolution before finalization
+4. Upgrade Path: Versioned schema with migration paths
+5. Fund Escrow: Smart contract holds funds until verification
+
+This design provides a robust foundation for a Proof-of-Contribution protocol that balances flexibility with determinism, enabling trustless verification of open-source development work.(PPW
