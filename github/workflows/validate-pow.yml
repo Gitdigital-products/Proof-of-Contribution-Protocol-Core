@@ -1,0 +1,27 @@
+name: Validate PoW Submission
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  validate-pow:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'pow-submission')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Validate PoW
+        id: validate
+        run: |
+          node scripts/validate-pow.js \
+            --submission "${{ github.event.pull_request.head.sha }}" \
+            --bounty-id "cpu-puzzle-001"
+        
+      - name: Trigger Payout (Simulated)
+        if: steps.validate.outputs.valid == 'true'
+        run: node scripts/simulate-payout.js \
+          --pr "${{ github.event.pull_request.number }}" \
+          --contributor "${{ github.event.pull_request.user.login }}" \
+          --amount "0.1"
