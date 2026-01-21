@@ -1,0 +1,48 @@
+Example Configurations
+
+Simple Project (examples/simple-project/pow.yaml)
+
+```yaml
+version: "1.0.0"
+
+project:
+  id: "simple-dapp"
+  repository: "https://github.com/user/simple-dapp"
+  license: "MIT"
+  commit_hash: "a1b2c3d4e5f67890123456789012345678901234"
+
+milestones:
+  - id: "MILESTONE-1"
+    title: "Core Contract Implementation"
+    description: "Implement main smart contract with basic functionality"
+    
+    acceptance_criteria:
+      - id: "contract-impl"
+        type: "commit"
+        condition:
+          min_count: 3
+          author: "dev-alice"
+        verification_data:
+          commit_hash: "b2c3d4e5f67890123456789012345678901234567"
+      
+      - id: "tests-passing"
+        type: "test_passing"
+        condition:
+          test_suite: "hardhat"
+          coverage_min: 80
+        verification_data:
+          test_report_url: "https://ci.example.com/reports/123"
+    
+    required_proofs:
+      - "git_commit"
+      - "ci_passing"
+    
+    payout:
+      total: "1000.0"
+      token: "0xERC20TOKENADDRESS"
+      splits:
+        contributor: "70%"
+        treasury: "20%"
+        platform: "10%"
+    
+    deadline: "2024-12-31T23:59:59Z"
