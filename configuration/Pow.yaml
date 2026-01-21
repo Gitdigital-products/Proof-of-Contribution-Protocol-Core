@@ -1,0 +1,32 @@
+1. Configuration (pow.yaml)
+
+```yaml
+# pow.yaml - Milestone Configuration
+version: "1.0"
+chain_id: "solana-mainnet"  # Optional chain-specific context
+milestones:
+  - id: "feature-complete"
+    description: "Complete feature implementation"
+    conditions:
+      - type: "pull_request"
+        action: "merged"
+        target_branch: "main"
+        required_labels: ["feature"]
+        min_count: 3
+        window_hours: 168  # 1 week
+      - type: "ci"
+        workflow: "test-suite"
+        conclusion: "success"
+        required: true
+  
+  - id: "audit-ready"
+    description: "Ready for security audit"
+    conditions:
+      - type: "tag"
+        pattern: "^v[0-9]+\.[0-9]+\.[0-9]+-rc[0-9]+$"
+      - type: "ci"
+        workflow: "security-scan"
+        conclusion: "success"
+      - type: "check_suite"
+        context: "codeql-analysis"
+        conclusion: "success"
