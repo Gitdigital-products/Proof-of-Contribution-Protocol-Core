@@ -1,0 +1,18 @@
+import { validatePowYaml } from '@gitdigital/proof-of-contribution-protocol-core';
+// or from relative path if used locally:
+// import { validatePowYaml } from './src/schema/validation';
+
+import fs from 'fs';
+import yaml from 'js-yaml';
+
+const raw = fs.readFileSync('pow.yaml', 'utf8');
+const data = yaml.load(raw);
+
+const result = validatePowYaml(data);
+
+if (!result.valid) {
+  console.error('pow.yaml is invalid:', result.errors);
+  process.exit(1);
+}
+
+console.log('pow.yaml is valid!');
