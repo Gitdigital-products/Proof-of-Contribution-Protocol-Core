@@ -1,0 +1,18 @@
+Payout Eligibility PDA
+
+```rust
+#[account]
+pub struct PayoutEligibility {
+    pub worker: Pubkey,           // Worker wallet
+    pub total_paid: u64,          // Lifetime payout amount
+    pub pending_payouts: u64,     // Current payout batch amount
+    pub last_payout_slot: u64,    // Slot of last payout
+    pub compliance_status: u8,    // 0=blocked, 1=pending, 2=approved
+    pub kyc_attestation: Pubkey,  // Reference to KYC PDA
+    pub bump: u8,
+}
+
+impl PayoutEligibility {
+    pub const SEED_PREFIX: &'static [u8] = b"payout_eligibility";
+    pub const SPACE: usize = 32 + 8 + 8 + 8 + 1 + 32 + 1;
+}
