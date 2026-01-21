@@ -1,0 +1,50 @@
+Attestation Storage Strategy
+
+We use PDA (Program Derived Address) storage because:
+
+· No rental costs for users (covered by protocol)
+· Deterministic addressing enables easy lookup
+· Program control over data modification
+· No NFT transferability prevents attestation selling
+· Scalable for batch verification
+
+3. Attestation Expiry & Revocation
+
+```rust
+pub fn revoke_attestation(ctx: Context<RevokeAttestation>) -> Result<()> {
+    // Only KYC provider or admin can revoke
+    require!(
+        ctx.accounts.kyc_provider.is_signer || 
+        ctx.accounts.admin.is_signer,
+        ComplianceError::InvalidAuthority
+    );
+    
+    let attestation = &mut ctx.accounts.attestation;
+    attestation.revoke_flag = true;
+    
+    // Update all linked payout eligibilities
+    let payout_pda = get_payout_pda(attestation.wallet);
+    if let Ok(payout_account) = ctx.remaining_accounts[0].try_borrow_mut() {
+        let mut eligibility = PayoutEligibility::try_from_slice(&payout_account.data)?;
+        eligibility.compliance_status = 0; // Blocked
+    }
+    
+    emit!(AttestationRevoked {
+        wallet: attestation.wallet,
+        revoked_by: ctx.accounts.kyc_provider.key(),
+        slot: Clock::get()?.slot,
+    });
+    
+    Ok(())
+}
+
+// Automatic expiry check
+pub fn check_expiry(attestation: &KYCAttestation) -> bool {
+    let current_slot = Clock::get().unwrap().slot;
+    if current_slot > attestation.expiry_slot {
+        // Auto-revoke after grace period
+        current_slot > attestation.expiry_slot + GRACE_PERIOD_SLOTS
+    } else {
+        false
+    }
+}
