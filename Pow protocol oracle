@@ -1,0 +1,17 @@
+Production GitHub App: PoW Protocol Oracle
+
+Architecture Overview
+
+```mermaid
+graph TB
+    A[GitHub Webhooks] --> B[Event Router]
+    B --> C[Event Validator]
+    C --> D[State Manager]
+    D --> E[Milestone Checker]
+    E --> F{Completion Met?}
+    F -->|Yes| G[Attestation Signer]
+    F -->|No| D
+    G --> H[Broadcast Attestation]
+    H --> I[Solana Program]
+    H --> J[EVM Contracts]
+```
