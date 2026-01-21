@@ -1,0 +1,24 @@
+version: 1
+bounties:
+  - id: "cpu-puzzle-001"
+    name: "SHA256 Partial Preimage"
+    description: "Find a nonce where SHA256('solana-pow-' + nonce) starts with 0000"
+    difficulty: 4  # leading zeros required
+    reward: 0.1    # SOL
+    expires: "2024-12-31T23:59:59Z"
+    validation:
+      type: "github_app"
+      app_id: "pow-validator-123"
+      private_key_secret: "POW_VALIDATOR_KEY"
+    payout:
+      network: "solana-devnet"
+      mint: "So11111111111111111111111111111111111111112"  // Wrapped SOL
+      treasury: "treasury_wallet_address_here"
+
+contributor_rewards:
+  - trigger: "pull_request"
+    conditions:
+      - "pow_validation.passed == true"
+      - "pow_validation.bounty_id == 'cpu-puzzle-001'"
+    action: "solana_transfer"
+    amount: "0.1 SOL"
