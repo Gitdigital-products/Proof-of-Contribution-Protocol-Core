@@ -1,0 +1,53 @@
+Payout Verification Flow
+
+```rust
+pub fn verify_payout_eligibility(
+   ctx: Context<VerifyPayout>,
+   payout_amount: u64,
+) -> Result<()> {
+   // 1. Check KYC attestation exists and is valid
+   let attestation = KYCAttestation::try_from_slice(
+       &ctx.accounts.attestation.data.borrow()
+   )?;
+   
+   let current_slot = Clock::get()?.slot;
+   require!(
+       attestation.is_valid(current_slot),
+       ComplianceError::InvalidAttestation
+   );
+   
+   // 2. Check minimum KYC level
+   let config = ComplianceConfig::try_from_slice(
+       &ctx.accounts.config.data.borrow()
+   )?;
+   
+   require!(
+       attestation.kyc_level >= config.kyc_required_level,
+       ComplianceError::InsufficientKYCLevel
+   );
+   
+   // 3. Check country restrictions
+   require!(
+       !config.banned_countries.contains(&attestation.country_code),
+       ComplianceError::RestrictedJurisdiction
+   );
+   
+   // 4. Check AML limits
+   let eligibility = PayoutEligibility::try_from_slice(
+       &ctx.accounts.eligibility.data.borrow()
+   )?;
+   
+   let projected_total = eligibility.pending_payouts + payout_amount;
+   require!(
+       projected_total <= config.max_daily_payout,
+       ComplianceError::AMLThresholdExceeded
+   );
+   
+   // 5. Update eligibility status
+   let mut eligibility = &mut ctx.accounts.eligibility;
+   eligibility.compliance_status = 2; // Approved
+   eligibility.pending_payouts = projected_total;
+   
+   // 6. Allow payout to proceed
+   Ok(())
+}
