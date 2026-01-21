@@ -1,0 +1,159 @@
+Instruction Definitions
+Instruction Definitions
+
+```rust
+#[derive(Accounts)]
+pub struct InitializePayoutConfig<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + PayoutConfig::INIT_SPACE,
+        seeds = [b"payout_config", authority.key().as_ref()],
+        bump
+    )]
+    pub payout_config: Account<'info, PayoutConfig>,
+    
+    pub treasury: SystemAccount<'info>,
+    pub platform_owner: SystemAccount<'info>,
+    pub mint: Account<'info, Mint>,
+    pub kyc_authority: SystemAccount<'info>,
+    
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+pub struct CreateMilestone<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
+    #[account(
+        mut,
+        has_one = authority,
+        seeds = [b"payout_config", authority.key().as_ref()],
+        bump = payout_config.bump
+    )]
+    pub payout_config: Account<'info, PayoutConfig>,
+    
+    #[account(
+        init,
+        payer = authority,
+        space = 8 + Milestone::INIT_SPACE,
+        seeds = [
+            b"milestone",
+            payout_config.key().as_ref(),
+            contributor.key().as_ref(),
+            &[milestone_number]
+        ],
+        bump
+    )]
+    pub milestone: Account<'info, Milestone>,
+    
+    pub contributor: SystemAccount<'info>,
+    pub verifier: SystemAccount<'info>,
+    
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct SubmitKycAttestation<'info> {
+    #[account(mut)]
+    pub kyc_authority: Signer<'info>,
+    
+    #[account(
+        init_if_needed,
+        payer = kyc_authority,
+        space = 8 + KycAttestation::INIT_SPACE,
+        seeds = [b"kyc", contributor.key().as_ref()],
+        bump
+    )]
+    pub kyc_attestation: Account<'info, KycAttestation>,
+    
+    pub contributor: SystemAccount<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(attestation_data: Vec<u8>, signature: [u8; 64])]
+pub struct ProcessMilestonePayout<'info> {
+    #[account(mut)]
+    pub payer: Signer<'info>,
+    
+    #[account(
+        mut,
+        seeds = [b"payout_config", payout_config.authority.as_ref()],
+        bump = payout_config.bump
+    )]
+    pub payout_config: Account<'info, PayoutConfig>,
+    
+    #[account(
+        mut,
+        seeds = [
+            b"milestone",
+            payout_config.key().as_ref(),
+            milestone.contributor.as_ref(),
+            &[milestone.milestone_number]
+        ],
+        bump = milestone.bump,
+        constraint = !milestone.is_completed,
+        constraint = milestone.amount_paid < milestone.amount
+    )]
+    pub milestone: Account<'info, Milestone>,
+    
+    #[account(
+        seeds = [b"kyc", milestone.contributor.key().as_ref()],
+        bump = kyc_attestation.bump,
+        constraint = kyc_attestation.is_valid,
+        constraint = kyc_attestation.expiry > Clock::get()?.unix_timestamp
+    )]
+    pub kyc_attestation: Account<'info, KycAttestation>,
+    
+    #[account(
+        init_if_needed,
+        payer = payer,
+        space = 8 + AttestationNonce::INIT_SPACE,
+        seeds = [b"nonce", milestone.key().as_ref()],
+        bump
+    )]
+    pub attestation_nonce: Account<'info, AttestationNonce>,
+    
+    // Token accounts
+    #[account(mut)]
+    pub funding_vault: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub contributor_token_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub treasury_token_account: Account<'info, TokenAccount>,
+    #[account(mut)]
+    pub platform_token_account: Account<'info, TokenAccount>,
+    
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+pub struct FundPayoutConfig<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
+    #[account(
+        mut,
+        seeds = [b"payout_config", authority.key().as_ref()],
+        bump = payout_config.bump
+    )]
+    pub payout_config: Account<'info, PayoutConfig>,
+    
+    #[account(mut)]
+    pub authority_token_account: Account<'info, TokenAccount>,
+    #[account(
+        mut,
+        seeds = [b"vault", payout_config.key().as_ref()],
+        bump
+    )]
+    pub funding_vault: Account<'info, TokenAccount>,
+    
+    pub token_program: Program<'info, Token>,
+}
