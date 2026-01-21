@@ -1,0 +1,49 @@
+Wallet Receiving Compliance Attestations
+
+```rust
+// Using Solana KYC SDK pattern
+pub fn issue_attestation(
+    ctx: Context<IssueAttestation>,
+    kyc_level: u8,
+    country_code: [u8; 2],
+    expiry_offset: Option<u64>,
+) -> Result<()> {
+    // 1. Verify KYC provider signature (off-chain verification)
+    require!(
+        ctx.accounts.kyc_provider.is_signer,
+        ComplianceError::InvalidAuthority
+    );
+    
+    // 2. Calculate PDA for attestation storage
+    let (attestation_pda, bump) = Pubkey::find_program_address(
+        &[
+            KYCAttestation::SEED_PREFIX,
+            ctx.accounts.wallet.key.as_ref(),
+            ctx.accounts.kyc_provider.key.as_ref(),
+        ],
+        ctx.program_id,
+    );
+    
+    // 3. Create attestation account
+    let attestation = &mut ctx.accounts.attestation;
+    attestation.wallet = ctx.accounts.wallet.key();
+    attestation.kyc_provider = ctx.accounts.kyc_provider.key();
+    attestation.kyc_level = kyc_level;
+    attestation.country_code = country_code;
+    attestation.expiry_slot = Clock::get()?.slot + 
+        expiry_offset.unwrap_or(DEFAULT_EXPIRY_SLOTS);
+    attestation.revoke_flag = false;
+    attestation.last_verified = Clock::get()?.unix_timestamp;
+    attestation.attestation_id = hash_kyc_data(&ctx.accounts.wallet.key());
+    attestation.bump = bump;
+    
+    // 4. Emit event for indexing
+    emit!(AttestationIssued {
+        wallet: ctx.accounts.wallet.key(),
+        kyc_provider: ctx.accounts.kyc_provider.key(),
+        kyc_level,
+        expiry_slot: attestation.expiry_slot,
+    });
+    
+    Ok(())
+}
