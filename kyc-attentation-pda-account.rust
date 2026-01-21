@@ -1,0 +1,25 @@
+ KYC Attestation PDA Account
+
+```rust
+#[account]
+pub struct KYCAttestation {
+    pub wallet: Pubkey,           // The compliant wallet
+    pub kyc_provider: Pubkey,     // Authority that issued attestation
+    pub kyc_level: u8,            // 0=unverified, 1=basic, 2=enhanced, 3=full
+    pub country_code: [u8; 2],    // ISO 3166-1 alpha-2
+    pub expiry_slot: u64,         // Slot number when attestation expires
+    pub revoke_flag: bool,        // Manual revocation flag
+    pub last_verified: i64,       // Unix timestamp of last verification
+    pub attestation_id: [u8; 32], // Unique ID for tracking
+    pub bump: u8,                 // PDA bump
+}
+
+impl KYCAttestation {
+    pub const SEED_PREFIX: &'static [u8] = b"kyc_attestation";
+    pub const SPACE: usize = 32 + 32 + 1 + 2 + 8 + 1 + 8 + 32 + 1;
+    
+    pub fn is_valid(&self, current_slot: u64) -> bool {
+        !self.revoke_flag && 
+        current_slot < self.expiry_slot
+    }
+}
