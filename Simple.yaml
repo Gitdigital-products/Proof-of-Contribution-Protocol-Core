@@ -1,0 +1,30 @@
+
+
+# 📘 Example Library (examples/)
+
+These examples help developers understand real‑world usage.
+
+## Simple Example (simple.yaml)
+
+`yaml
+version: "1.0.0"
+project:
+  id: "demo"
+  name: "Demo Project"
+contributors:
+  - id: "alice"
+    name: "Alice"
+contributions:
+  - id: "c1"
+    contributor: "alice"
+    category: "code"
+    description: "Fixed bug in validation engine"
+    evidence:
+      - type: "commit"
+        uri: "https://github.com/.../commit/abc123"
+metadata:
+  created_at: "2025-01-01T00:00:00Z"
+  updated_at: "2025-01-01T00:00:00Z"
+`
+
+---
