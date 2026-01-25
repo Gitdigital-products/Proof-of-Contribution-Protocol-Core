@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Proof‑of‑Contribution Protocol Core</title>
+
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --text: #e6edf3;
+      --accent: #58a6ff;
+      --border: #30363d;
+      --radius: 8px;
+      --font: "Inter", system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.4rem;
+      font-weight: 700;
+    }
+
+    header p {
+      margin-top: 0.5rem;
+      font-size: 1.2rem;
+      opacity: 0.8;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+      background: var(--panel);
+    }
+
+    nav a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: var(--accent);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      opacity: 0.6;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Proof‑of‑Contribution Protocol Core</h1>
+    <p>A deterministic, schema‑driven standard for verifiable contributions.</p>
+  </header>
+
+  <nav>
+    <a href="#overview">Overview</a>
+    <a href="#spec">Protocol Spec</a>
+    <a href="#pow">pow.yaml</a>
+    <a href="#validation">Validation</a>
+    <a href="#examples">Examples</a>
+    <a href="#docs">Docs</a>
+  </nav>
+
+  <div class="container">
+
+    <div class="card" id="overview">
+      <h2>Overview</h2>
+      <p>
+        The Proof‑of‑Contribution Protocol provides a unified, verifiable way to describe contributions across any project or ecosystem.
+        It defines a canonical schema (<code>pow.yaml</code>), a deterministic validation pipeline, and a set of guarantees that ensure
+        contributions are structured, portable, and machine‑verifiable.
+      </p>
+    </div>
+
+    <div class="card" id="spec">
+      <h2>Protocol Specification</h2>
+      <p>
+        The protocol defines:
+      </p>
+      <ul>
+        <li>Contribution data model</li>
+        <li>Contributor identity structure</li>
+        <li>Evidence types and formats</li>
+        <li>Validation rules and invariants</li>
+        <li>Versioning and forward‑compatibility guarantees</li>
+      </ul>
+      <p>
+        Full specification is available in the repository under <code>/docs/spec.md</code>.
+      </p>
+    </div>
+
+    <div class="card" id="pow">
+      <h2>pow.yaml Specification</h2>
+      <p>
+        <code>pow.yaml</code> is the canonical representation of contributions. It includes:
+      </p>
+      <ul>
+        <li>Project metadata</li>
+        <li>Contributor identities</li>
+        <li>Contribution entries</li>
+        <li>Evidence records</li>
+        <li>Document metadata</li>
+      </ul>
+      <p>
+        See <code>/docs/pow-yaml-spec.md</code> for the full field‑by‑field breakdown.
+      </p>
+    </div>
+
+    <div class="card" id="validation">
+      <h2>Validation Pipeline</h2>
+      <p>The validation engine performs:</p>
+      <ol>
+        <li><strong>Schema Validation</strong> — structure & types</li>
+        <li><strong>Semantic Validation</strong> — logical consistency</li>
+        <li><strong>Reference Validation</strong> — evidence URIs</li>
+        <li><strong>Integrity Validation</strong> — hashes & artifacts</li>
+      </ol>
+      <p>
+        See <code>/docs/validation-pipeline.md</code> for details.
+      </p>
+    </div>
+
+    <div class="card" id="examples">
+      <h2>Examples</h2>
+      <p>Example <code>pow.yaml</code> documents are available under <code>/docs/examples/</code>:</p>
+      <ul>
+        <li>Simple example</li>
+        <li>Advanced example</li>
+        <li>Multi‑project example</li>
+      </ul>
+    </div>
+
+    <div class="card" id="docs">
+      <h2>Documentation</h2>
+      <p>
+        Full documentation is available in the repository under <code>/docs/</code>, including:
+      </p>
+      <ul>
+        <li>Protocol Specification</li>
+        <li>pow.yaml Specification</li>
+        <li>Architecture Overview</li>
+        <li>API Reference</li>
+        <li>Integration Guide</li>
+        <li>Governance & Security</li>
+        <li>Audit Materials</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <footer>
+    GitDigital Products — Proof‑of‑Contribution Protocol Core
+  </footer>
+
+</body>
+</html>
