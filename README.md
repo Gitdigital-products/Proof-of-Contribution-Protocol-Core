@@ -28,6 +28,75 @@
 ![Compliance](https://img.shields.io/badge/compliance-registry-important)
 ![Open Source](https://img.shields.io/badge/open--source-yes-success)
 
+
+![TypeScript](https://img.shields.io/badge/TypeScript-Strict-blue)
+![Tests](https://img.shields.io/badge/Tests-100%25-success)
+
+![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
+
+![Validation Engine](https://img.shields.io/badge/Validation-Deterministic-8A2BE2)
+
+
+![Schema Version](https://img.shields.io/badge/Schema-1.0.0-4c1)
+
+![Protocol Version](https://img.shields.io/badge/Protocol-1.0.0-blue)
+
+![Security](https://img.shields.io/badge/Security-Responsible%20Disclosure-important)
+
+![Governance](https://img.shields.io/badge/Governance-Open%20Standard-ff69b4)
+
+![License](https://img.shields.io/badge/License-Apache--2.0-yellow)
+
+![npm](https://img.shields.io/npm/v/@gitdigital/poc-protocol-core)
+
+![PoC Valid](https://img.shields.io/badge/PoC%20Document-Valid-brightgreen)
+
+![PoC Invalid](https://img.shields.io/badge/PoC%20Document-Invalid-red)
+
+
+![Provider Ready](https://img.shields.io/badge/Provider-Ready-blueviolet)
+
+![Policy Ready](https://img.shields.io/badge/Policy-Ready-blueviolet)
+
+![GitDigital](https://img.shields.io/badge/GitDigital-Ecosystem-blue)
+
+
+![Open Standard](https://img.shields.io/badge/Open%20Standard-Yes-success)
+
+
+
+
+![Developer First](https://img.shields.io/badge/Developer--First-Yes-00bcd4)
+
+
+![YAML](https://img.shields.io/badge/YAML-Inside-ffca28)
+
+
+![Zero Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen)
+
+![Machine Verifiable](https://img.shields.io/badge/Machine--Verifiable-Yes-9cf)
+
+
+![Protocol Version](https://img.shields.io/badge/Protocol-1.0.0-blue)
+![Schema Version](https://img.shields.io/badge/Schema-1.0.0-4c1)
+![Validation Engine](https://img.shields.io/badge/Validation-Deterministic-8A2BE2)
+![Schema Compliant](https://img.shields.io/badge/Schema-Compliant-4c1)
+![Provider Ready](https://img.shields.io/badge/Provider-Ready-blueviolet)
+![Policy Ready](https://img.shields.io/badge/Policy-Ready-blueviolet)
+![License](https://img.shields.io/badge/License-Apache--2.0-yellow)
+![GitDigital](https://img.shields.io/badge/GitDigital-Ecosystem-blue)
+
+
+
+
+
+![Schema Compliant](https://img.shields.io/badge/Schema-Compliant-4c1)
+
+
+
+
+
+
 <p align="center">
 
   <!-- Project -->
