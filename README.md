@@ -1,3 +1,27 @@
+<p align="center">
+
+  <!-- Status & Version -->
+  <img src="https://img.shields.io/badge/status-active-brightgreen" />
+  <img src="https://img.shields.io/badge/version-0.1.0-blue" />
+  <img src="https://img.shields.io/badge/protocol-alpha-orange" />
+
+  <!-- Governance & Security -->
+  <img src="https://img.shields.io/badge/governance-open--standards-purple" />
+  <img src="https://img.shields.io/badge/security-policy-important" />
+  <img src="https://img.shields.io/badge/license-MIT-green" />
+
+  <!-- Build & Quality -->
+  <img src="https://img.shields.io/badge/build-pending-lightgrey" />
+  <img src="https://img.shields.io/badge/tests-coming_soon-yellow" />
+  <img src="https://img.shields.io/badge/coverage-0%25-red" />
+
+  <!-- Ecosystem Identity -->
+  <img src="https://img.shields.io/badge/ecosystem-GitDigital-blueviolet" />
+  <img src="https://img.shields.io/badge/solana-aligned-4B0082" />
+
+</p>
+
+
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
 ![Version](https://img.shields.io/badge/version-v1.0.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-purple)
