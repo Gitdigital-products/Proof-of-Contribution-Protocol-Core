@@ -1,0 +1,32 @@
+---
+
+🛡️ 4. Security Scan (security.yml)
+
+`yaml
+name: Security Scan
+
+on:
+  schedule:
+    - cron: "0 3   *" # daily at 3am UTC
+  workflow_dispatch:
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+`
+
+Notes:  
+- Daily automated security scanning.  
+- Required for protocol‑grade infrastructure.  
