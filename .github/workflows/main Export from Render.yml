@@ -1,0 +1,65 @@
+# Exported from Render on 2026-01-29T11:31:10Z
+version: "1"
+projects:
+- name: GitDigital Products
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: Proof-of-Contribution-Protocol-Core
+      runtime: static
+      repo: https://github.com/Gitdigital-products/Proof-of-Contribution-Protocol-Core
+      envVars:
+      - key: Render_Enviorment
+        sync: false
+      buildCommand: Run
+      staticPublishPath: build
+      autoDeployTrigger: commit
+    - type: web
+      name: Proof-of-Contribution-Protocol-Core service
+      runtime: go
+      repo: https://github.com/Gitdigital-products/Proof-of-Contribution-Protocol-Core
+      plan: free
+      envVars:
+      - key: Environment_Render
+        sync: false
+      region: oregon
+      buildCommand: go build -tags netgo -ldflags '-s -w' -o app
+      startCommand: ./app
+      autoDeployTrigger: commit
+    - type: web
+      name: GitDigial-api-gateway
+      runtime: static
+      repo: https://github.com/Gitdigital-products/STEALTH-METADATA-ARCHITECTURE
+      buildCommand: npm install && npm run build && npm run export
+      staticPublishPath: .
+      autoDeployTrigger: commit
+    - type: web
+      name: solana-governance-policy-engine
+      runtime: docker
+      repo: https://github.com/Gitdigital-products/solana-governance-policy-engine
+      plan: free
+      region: oregon
+      dockerContext: .
+      dockerfilePath: ./Dockerfile
+      registryCredential:
+        fromRegistryCreds:
+          name: 'RickCreator87 '
+      autoDeployTrigger: commit
+    - type: keyvalue
+      name: Catches-api-gateway
+      plan: free
+      region: oregon
+      maxmemoryPolicy: allkeys-lru
+      ipAllowList: []
+    databases:
+    - name: 'GitDigital Products '
+      databaseName: gitdigital_products
+      user: gitdigital_products_user
+      plan: free
+      region: oregon
+      ipAllowList:
+      - source: 0.0.0.0/0
+        description: everywhere
+      postgresMajorVersion: "18"
+      
